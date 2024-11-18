@@ -1,11 +1,9 @@
 
-use clap::Parser;
-
 use std::any::Any;
-use std::sync::{Arc, Mutex};
+use std::sync::{Arc};
 use std::time::Duration;
 use zeroconf::prelude::*;
-use zeroconf::{MdnsBrowser, ServiceDiscovery, ServiceType};
+use zeroconf::{MdnsBrowser, ServiceDiscovery};
 use crate::get_discoveries;
 
 pub fn start() -> zeroconf::Result<()> {

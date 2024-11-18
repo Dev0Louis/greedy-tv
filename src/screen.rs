@@ -1,7 +1,7 @@
 use crate::{get_discoveries, get_discoveries_index};
 use crossterm::event::{KeyCode, KeyEvent};
 use ratatui::prelude::{Color, Span, Style};
-use ratatui::style::{Styled, Stylize};
+use ratatui::style::{Stylize};
 use ratatui::text::Line;
 use std::ops::Add;
 use std::process::exit;
@@ -28,7 +28,7 @@ impl ViewDiscoveryScreen {
 }
 
 impl Screen for ViewDiscoveryScreen {
-    fn draw<'a>(&'a self, lines: &mut Vec<Line<'a>>, seconds_since_start: u64) {
+    fn draw<'a>(&'a self, lines: &mut Vec<Line<'a>>, _seconds_since_start: u64) {
         let name = self.discovery.name().clone();
         let hostname = self.discovery.host_name().clone().add(":").add(&self.discovery.port().to_string());
         let ip = self.discovery.domain().clone().add(":").add(&self.discovery.port().to_string());
@@ -48,7 +48,7 @@ impl Screen for ViewDiscoveryScreen {
         
         
         let sub_types = service.sub_types();
-        if (sub_types.is_empty()) {
+        if sub_types.is_empty() {
             lines.push(Line::from(Self::style_span("No sub types.".to_string(), grey))); grey = !grey;
         } else {
             sub_types.iter().for_each(|t| lines.push(Line::from(t.clone())));
@@ -68,7 +68,7 @@ impl Screen for ViewDiscoveryScreen {
     }
     
     fn on_key(&self, key_event: KeyEvent) -> Option<Box<dyn Screen>> {
-        if (key_event.code == KeyCode::Esc) {
+        if key_event.code == KeyCode::Esc {
             Some(Box::from(ListScreen {}))
         } else {
             None
@@ -82,7 +82,7 @@ pub struct ListScreen {
 }
 
 impl Screen for ListScreen {
-    fn draw(&self, lines: &mut Vec<Line>, seconds_since_start: u64) {
+    fn draw(&self, lines: &mut Vec<Line>, _seconds_since_start: u64) {
         get_discoveries().lock().unwrap().iter().enumerate().for_each(|(index, service)| {
             let selection_indicator = get_symbol_for_index(index);
 
@@ -96,7 +96,7 @@ impl Screen for ListScreen {
                             service.port()
                     )
                 );
-                if (index % 2 == 0) {
+                if index % 2 == 0 {
                     span.style(Style::from(Color::Cyan))
                 } else {
                     span.style(Style::from(Color::LightCyan))
@@ -110,16 +110,16 @@ impl Screen for ListScreen {
     }
 
     fn on_key(&self, key_event: KeyEvent) -> Option<Box<dyn 'static + Screen>> {
-        if (key_event.code == KeyCode::Up) {
+        if key_event.code == KeyCode::Up {
             let discoveries_index = &mut get_discoveries_index();
             let mut lock = discoveries_index.lock().unwrap();
-            if (*lock != 0) {
+            if *lock != 0 {
                 (*lock) -= 1;
             }
-        } else if (key_event.code == KeyCode::Down) {
+        } else if key_event.code == KeyCode::Down {
             let discoveries_index = &mut get_discoveries_index();
             let mut lock = discoveries_index.lock().unwrap();
-            if (is_in_discoveries_range((*lock).clone() + 1)) {
+            if is_in_discoveries_range((*lock).clone() + 1) {
                 (*lock) += 1;
             }
         } else if key_event.code == KeyCode::Enter {
@@ -138,7 +138,7 @@ impl Screen for ListScreen {
 }
 
 fn get_symbol_for_index(index: usize) -> Span<'static> {
-    if (is_selected(&index)) {
+    if is_selected(&index) {
         Span::from("[x]").style(Style::from(Color::White))
     } else {
         Span::from("[ ]").style(Style::from(Color::Gray))

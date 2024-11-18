@@ -1,7 +1,6 @@
 #[macro_use]
 extern crate log;
 mod client;
-mod server;
 mod screen;
 
 use crate::screen::{ListScreen, Screen};
@@ -32,18 +31,16 @@ fn main() {
                     let mut screen = screen.lock().unwrap();
                     match screen.on_key(key_event) {
                         Some(new_screen) => {
-                            let a: Box<dyn 'static + Screen> = new_screen;
-                            *screen = a;
+                            *screen = new_screen;
                         }
                         None => {}
                     };
-                    
                 }
                 _ => {}
             }
         }
     }
-    ratatui::restore();
+    //ratatui::restore();
 }
 
 fn draw(frame: &mut Frame, seconds: u64, screen: &Mutex<Box<dyn Screen>>) {

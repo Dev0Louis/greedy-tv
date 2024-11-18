@@ -4,31 +4,22 @@ mod client;
 mod server;
 mod screen;
 
-use std::cell::RefCell;
-use clap::Parser;
-use crossterm::event;
-use crossterm::event::{Event, KeyCode};
-use ratatui::style::{Color, Style};
-use ratatui::text::{Line, Span, Text};
-use ratatui::Frame;
-use std::fmt::Debug;
-use std::ops::Add;
-use std::sync::{Arc, Mutex};
-use std::time::{Duration, Instant};
-use std::thread;
-use crossterm::terminal::EnterAlternateScreen;
-use zeroconf::ServiceDiscovery;
 use crate::screen::{ListScreen, Screen};
+use crossterm::event;
+use crossterm::event::Event;
+use ratatui::style::{Color, Style};
+use ratatui::text::{Line, Text};
+use ratatui::Frame;
+use std::sync::Mutex;
+use std::thread;
+use std::time::{Duration, Instant};
+use zeroconf::ServiceDiscovery;
 
 fn main() {
     thread::spawn(move || {
         client::start().expect("Client has boomed.");
     });
-
-    thread::spawn(move || {
-        server::start().expect("Server has boomed.");
-    });
-
+    
     let now = Instant::now();
     let screen: Box<Mutex<Box<dyn Screen>>> = Box::new(Mutex::new(Box::new(ListScreen {})));
     let mut terminal = ratatui::init();
@@ -51,7 +42,6 @@ fn main() {
                 _ => {}
             }
         }
-
     }
     ratatui::restore();
 }

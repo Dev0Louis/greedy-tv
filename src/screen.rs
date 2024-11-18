@@ -1,16 +1,12 @@
-use std::fmt::format;
-use std::ops::Add;
-use std::sync::Mutex;
+use crate::{get_discoveries, get_discoveries_index};
 use crossterm::event::{KeyCode, KeyEvent};
-use crossterm::style::style;
-use ratatui::Frame;
-use ratatui::layout::Spacing;
 use ratatui::prelude::{Color, Span, Style};
 use ratatui::style::{Styled, Stylize};
 use ratatui::text::Line;
-use zeroconf::{ServiceDiscovery, TxtRecord};
+use std::ops::Add;
+use std::process::exit;
 use zeroconf::txt_record::TTxtRecord;
-use crate::{get_discoveries, get_discoveries_index};
+use zeroconf::ServiceDiscovery;
 
 pub trait Screen {
     fn draw<'a>(&'a self, lines: &mut Vec<Line<'a>>, seconds_since_start: u64);
@@ -61,6 +57,8 @@ impl Screen for ViewDiscoveryScreen {
         match self.discovery.txt() {
             None => {}
             Some(txt) => {
+                lines.push(Line::from("Supplied Txt:").style(Style::from(Color::Blue).bg(Color::Black)));
+                
                 txt.iter().for_each(|t| {
                     lines.push(Line::from(format!("{} | {}", t.0, t.1)));
                 })
@@ -132,6 +130,8 @@ impl Screen for ListScreen {
                 ViewDiscoveryScreen {
                     discovery: out
                 }));
+        } else if key_event.code == KeyCode::Esc {  
+            exit(0);
         }
         None
     }

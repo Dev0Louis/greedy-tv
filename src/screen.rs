@@ -125,11 +125,16 @@ impl Screen for ListScreen {
         } else if key_event.code == KeyCode::Enter {
             let discoveries_index = &mut get_discoveries_index();
             let index = *discoveries_index.lock().unwrap();
-            let out: ServiceDiscovery = get_discoveries().lock().unwrap().get(index).unwrap().clone();
-            return Some(Box::new(
-                ViewDiscoveryScreen {
-                    discovery: out
-                }));
+            let discoveries = get_discoveries().lock().unwrap();
+            if !discoveries.is_empty() {
+                let out: ServiceDiscovery = discoveries.get(index).unwrap().clone();
+                return Some(Box::new(
+                    ViewDiscoveryScreen {
+                        discovery: out
+                    }));
+            } else { 
+                return None;
+            }
         } else if key_event.code == KeyCode::Esc {  
             exit(0);
         }
